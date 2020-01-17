@@ -8,8 +8,8 @@ feature 'Display bookmarks through /bookmark route' do
     
     visit('/bookmarks')
     
-    expect(Bookmark.all).to include "MakersAcademy"
-    expect(Bookmark.all).to include "Destroy"
-    expect(Bookmark.all).to include "Google"
+    expect(Bookmark.all[0].title).to include "MakersAcademy"
+    expect(Bookmark.all[1].title).to include "Destroy"
+    expect(Bookmark.all[2].title).to include "Google"
   end
 end

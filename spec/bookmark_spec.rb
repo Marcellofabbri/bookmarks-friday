@@ -2,31 +2,46 @@ require './lib/bookmark.rb'
 
 describe Bookmark do
 
-  describe "#init" do
-    it 'returns an array to hold bookmarks on creation' do
-      expect(subject.bookmarks).to eq []
-    end
-  end
 
   describe '.all' do
     it 'returns a list of all the bookmarks' do
       connection = PG.connect(dbname: 'bookmark_manager_test')
 
-      connection.exec("INSERT INTO bookmarks (url, title) VALUES ('http://www.makersacademy.com', 'MakersAcademy');")
-      connection.exec("INSERT INTO bookmarks (url, title) VALUES('http://www.destroyallsoftware.com', 'Destroy');")
-      connection.exec("INSERT INTO bookmarks (url, title) VALUES('http://www.google.com', 'Google');")
-      
-      expect(Bookmark.all).to include "MakersAcademy"
-      expect(Bookmark.all).to include "Destroy"
-      expect(Bookmark.all).to include "Google"
+      bookmark = Bookmark.create(url: "http://www.makersacademy.com", title: "MakersAcademy")
+      Bookmark.create(url: "http://www.destroyallsoftware.com", title: "Destroy All Software")
+      Bookmark.create(url: "http://www.google.com", title: "Google")
+
+      bookmarks = Bookmark.all
+
+      expect(bookmarks.first).to be_a Bookmark
+      expect(bookmarks.first.id).to eq bookmark.id
+      expect(bookmarks.first.url).to eq 'http://www.makersacademy.com'
+      expect(bookmarks.first.title).to eq 'MakersAcademy'
     end
   end
 
   describe '.create' do
     it 'creates a new bookmark' do
-      Bookmark.create(url: 'http://www.yaytesting.com', title: 'YayTesting')
+      bookmark = Bookmark.create(url: 'http://www.yaytesting.com', title: 'YayTesting')
+      persisted_data = PG.connect(dbname: 'bookmark_manager_test').query("SELECT * FROM bookmarks WHERE id = #{bookmark.id};")
+      expect(bookmark.url).to eq 'http://www.yaytesting.com'
+      expect(bookmark.title).to eq 'YayTesting'
 
-      expect(Bookmark.all).to include 'YayTesting'
+      expect(bookmark).to be_a Bookmark
+      expect(bookmark.id).to eq persisted_data.first['id']
+      expect(bookmark.title).to eq 'YayTesting'
+      expect(bookmark.url).to eq 'http://www.yaytesting.com'
     end
   end
+
+  describe '.delete' do
+    it "deletes a bookmark" do
+      bookmark = Bookmark.create(title: 'YayTesting', url: :'http://www.yaytesting.com')
+
+      Bookmark.delete(id: bookmark.id)
+
+      expect(Bookmark.all.length).to eq 0
+    end
+  end
+
 end
