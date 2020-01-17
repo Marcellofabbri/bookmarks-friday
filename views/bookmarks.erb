@@ -12,9 +12,17 @@
     <%= bookmark.title %> </a> 
 
     <form action="/bookmarks/<%= bookmark.id %>" method="post">
-        <input type='hidden' name='_method' value='DELETE'/>
-        <input type="submit" value="Delete" />
+        <input type='hidden' name='_method' value='DELETE'>
+        <input type="submit" value="Delete">
       </form>
+
+    <form action="/bookmarks" method="post">
+      <input type='hidden'm name='update_id' value='<%= bookmark.id %>'>
+      <input type='text' name='update_title' value='<%= bookmark.title %>'>
+      <input type='text' name='update_url' value='<%= bookmark.url %>'>
+      <input type='hidden' name='_method' value='PATCH'>
+      <input type="submit" value="Update">
+    </form>
 
     </li>
     
